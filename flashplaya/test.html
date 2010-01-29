@@ -5,6 +5,7 @@
 
   var HEX = "0123456789ABCDEF";
 
+
   var notes = [48, 24, 36, null, 36, 24, 48, 36, null, null, 24, 48, 60, null, 48, null ];
   var BPM = 100.0;
 
@@ -12,8 +13,6 @@
 
   var patternLengthInSamples = 4 * 44100 / beatFreq;
   var noteLengthInSamples = patternLengthInSamples / 16;
-  console.log(beatFreq);
-  console.log(patternLengthInSamples);
 
   function noteToFreq(note) {
       return 440.0 * ( Math.pow(2.0,((note - 69.0) / 12)));
@@ -38,10 +37,27 @@
   }
 
 
+  function encodeBase64(bytes) {
+    var BASE64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+    var enc1 = bytes[0] >> 2;
+    var enc2 = ((bytes[0] & 3) << 4) | (bytes[1] >> 4);
+    var enc3 = ((bytes[1] & 15) << 2) | (bytes[2] >> 6);
+    var enc4 = bytes[2] & 63;
+
+
+    if (isNaN(bytes[1])) {
+      enc3 = enc4 = 64;
+    } else if (isNaN(bytes[2])) {
+      enc4 = 64;
+    }
+    return BASE64.charAt(enc1) + BASE64.charAt(enc2) + BASE64.charAt(enc3) + BASE64.charAt(enc4);
+  }
+
   function genSound(bufferSize, bufferPos) {
       var startTime = new Date().getTime();
 
       var buffer = "";
+      var byteBuffer = [];
 
 
       for(var i=0;i<bufferSize;i++) {
@@ -60,18 +76,18 @@
          }
 
 
-         var word = Math.round((sound+1) * (32768 / 2));
-
-         buffer += HEX.charAt(word & 0xF);
-         buffer += HEX.charAt((word >> 4) & 0xF);
-         buffer += HEX.charAt((word >> 8) & 0xF);
-         buffer += HEX.charAt((word >> 12) & 0xF);
-
-
-
+         var word = Math.round((sound * 32768.0 / 2) + 32768.0);
+         byteBuffer.push(word & 0xFF);
+         byteBuffer.push((word >> 8) & 0xFF);
+         if (byteBuffer.length >= 3) {
+           buffer += encodeBase64(byteBuffer);
+           byteBuffer = byteBuffer.slice(3);
+         }
       }
+      if (byteBuffer.length > 0) buffer += encodeBase64(byteBuffer);
+
       var endTime = new Date().getTime();
-      // console.log("time: " + (endTime - startTime));
+      console.log("time: " + (endTime - startTime));
       return buffer;
   }
 
