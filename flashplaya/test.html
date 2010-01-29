@@ -1,0 +1,46 @@
+<html>
+<head><title>haXe Flash</title>
+
+<script type="text/javascript" charset="utf-8">
+  function genSound(size, eventPosition) {
+    buffer = "";
+    ar = [];
+    for(var i=0;i<size;i++) {
+      var sound = Math.sin((i+eventPosition)/Math.PI/2)*0.5;
+      var intSound = sound * 32768.0;
+      buffer += String.fromCharCode(intSound & 0xFF);
+      buffer += String.fromCharCode((intSound >> 8) & 0xFF);
+
+      // ar.push(Math.floor(Math.sin((i+eventPosition)/Math.PI/2)*0.25 * 255.0));
+    }
+    // console.log(buffer);
+    return buffer;
+  }
+</script>
+</head>
+<body bgcolor="#dddddd">
+<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"
+        width="400"
+    height="300"
+    id="haxe"
+    align="middle">
+<param name="movie" value="test.swf"/>
+<param name="allowScriptAccess" value="always" />
+<param name="quality" value="high" />
+<param name="scale" value="noscale" />
+<param name="salign" value="lt" />
+<param name="bgcolor" value="#ffffff"/>
+<embed src="test.swf"
+       bgcolor="#ffffff"
+       width="400"
+       height="300"
+       name="haxe"
+       quality="high"
+       align="middle"
+       allowScriptAccess="always"
+       type="application/x-shockwave-flash"
+       pluginspage="http://www.macromedia.com/go/getflashplayer"
+/>
+</object>
+</body>
+</html>

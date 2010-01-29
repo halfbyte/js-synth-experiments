@@ -1,0 +1,5 @@
+-swf9 test.swf
+-main Test
+-swf-version 10
+-D network-sandbox
+-debug
