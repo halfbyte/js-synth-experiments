@@ -2,16 +2,23 @@
 <head><title>haXe Flash</title>
 
 <script type="text/javascript" charset="utf-8">
+
+  var HEX = "0123456789ABCDEF";
+
+  function toHex(val) {
+
+  }
+
   function genSound(size, eventPosition) {
     buffer = "";
     ar = [];
     for(var i=0;i<size;i++) {
-      var sound = Math.sin((i+eventPosition)/Math.PI/2)*0.5;
-      var intSound = sound * 32768.0;
-      buffer += String.fromCharCode(intSound & 0xFF);
-      buffer += String.fromCharCode((intSound >> 8) & 0xFF);
-
-      // ar.push(Math.floor(Math.sin((i+eventPosition)/Math.PI/2)*0.25 * 255.0));
+      var sound = Math.sin((i+eventPosition)/32.0/Math.PI)*0.9;
+      var intSound = Math.round(sound * 32768.0) + 32768.0;
+      buffer += HEX.charAt(intSound & 0xF);
+      buffer += HEX.charAt((intSound >> 4) & 0xF);
+      buffer += HEX.charAt((intSound >> 8) & 0xF);
+      buffer += HEX.charAt((intSound >> 12) & 0xF);
     }
     // console.log(buffer);
     return buffer;
@@ -19,6 +26,7 @@
 </script>
 </head>
 <body bgcolor="#dddddd">
+  <input type="text" id="foobar">
 <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"
         width="400"
     height="300"
