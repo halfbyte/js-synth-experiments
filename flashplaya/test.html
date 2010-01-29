@@ -5,15 +5,82 @@
 
   var HEX = "0123456789ABCDEF";
 
-  function toHex(val) {
+  var notes = [48, 24, 36, null, 36, 24, 48, 36, null, null, 24, 48, 60, null, 48, null ];
+  var BPM = 100.0;
 
+  var beatFreq = BPM / 60.0
+
+  var patternLengthInSamples = 4 * 44100 / beatFreq;
+  var noteLengthInSamples = patternLengthInSamples / 16;
+  console.log(beatFreq);
+  console.log(patternLengthInSamples);
+
+  function noteToFreq(note) {
+      return 440.0 * ( Math.pow(2.0,((note - 69.0) / 12)));
+  }
+  var in1=0, in2=0, in3=0, in4=0;
+  var out1=0, out2=0, out3=0, out4=0;
+
+  function svf(input, fc, res) {
+      var f = fc * 1.16;
+      var fb = res * (1.0 - 0.15 * f * f);
+      input -= out4 * fb;
+      input *= 0.35013 * (f*f)*(f*f);
+      out1 = input + 0.3 * in1 + (1 - f) * out1; // Pole 1
+      in1  = input;
+      out2 = out1 + 0.3 * in2 + (1 - f) * out2; // Pole 2
+      in2  = out1;
+      out3 = out2 + 0.3 * in3 + (1 - f) * out3;  // Pole 3
+      in3  = out2;
+      out4 = out3 + 0.3 * in4 + (1 - f) * out4;  // Pole 4
+      in4  = out3;
+      return out4;
   }
 
-  function genSound(size, eventPosition) {
+
+  function genSound(bufferSize, bufferPos) {
+      var startTime = new Date().getTime();
+
+      var buffer = "";
+
+
+      for(var i=0;i<bufferSize;i++) {
+         var posInPattern = (bufferPos + i) % patternLengthInSamples;
+         var noteInPattern = posInPattern / (noteLengthInSamples);
+         var posInNote = (posInPattern % (noteLengthInSamples)) / noteLengthInSamples;
+         var sound = 0;
+         if (notes[Math.floor(noteInPattern)] != null) {
+             var notePeriod = 44100.0 / noteToFreq(notes[Math.floor(noteInPattern)]);
+             sound = 1 - ((((i + bufferPos) % notePeriod) / notePeriod) * 2);
+             sound = svf(sound, 0.2 * (1.0 - posInNote + 0.5), 3.1);
+             sound *= 1.0 - (posInNote);
+         } else {
+             sound = 1;
+             sound = svf(sound, 0.5, 3.1);
+         }
+
+
+         var word = Math.round((sound+1) * (32768 / 2));
+
+         buffer += HEX.charAt(word & 0xF);
+         buffer += HEX.charAt((word >> 4) & 0xF);
+         buffer += HEX.charAt((word >> 8) & 0xF);
+         buffer += HEX.charAt((word >> 12) & 0xF);
+
+
+
+      }
+      var endTime = new Date().getTime();
+      // console.log("time: " + (endTime - startTime));
+      return buffer;
+  }
+
+
+  function __genSound(size, eventPosition) {
     buffer = "";
     ar = [];
     for(var i=0;i<size;i++) {
-      var sound = Math.sin((i+eventPosition)/32.0/Math.PI)*0.9;
+      var sound = Math.sin((i+eventPosition)/8.0/Math.PI)*0.9;
       var intSound = Math.round(sound * 32768.0) + 32768.0;
       buffer += HEX.charAt(intSound & 0xF);
       buffer += HEX.charAt((intSound >> 4) & 0xF);
@@ -32,7 +99,7 @@
     height="300"
     id="haxe"
     align="middle">
-<param name="movie" value="test.swf"/>
+<param name="movie" value="test.swf?dd"/>
 <param name="allowScriptAccess" value="always" />
 <param name="quality" value="high" />
 <param name="scale" value="noscale" />
