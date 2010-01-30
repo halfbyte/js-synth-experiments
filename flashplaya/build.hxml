@@ -3,3 +3,4 @@
 -swf-version 10
 -D network-sandbox
 -debug
+-swf-header 200:30:20:FFFFFF

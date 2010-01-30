@@ -76,7 +76,7 @@
          }
 
 
-         var word = Math.round((sound * 32768.0 / 2) + 32768.0);
+         var word = Math.round((sound * 32768.0 *0.9) + 32768.0);
          byteBuffer.push(word & 0xFF);
          byteBuffer.push((word >> 8) & 0xFF);
          if (byteBuffer.length >= 3) {
@@ -111,8 +111,8 @@
 <body bgcolor="#dddddd">
   <input type="text" id="foobar">
 <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"
-        width="400"
-    height="300"
+        width="200"
+    height="30"
     id="haxe"
     align="middle">
 <param name="movie" value="test.swf?dd"/>
@@ -123,8 +123,8 @@
 <param name="bgcolor" value="#ffffff"/>
 <embed src="test.swf"
        bgcolor="#ffffff"
-       width="400"
-       height="300"
+       width="200"
+       height="30"
        name="haxe"
        quality="high"
        align="middle"
